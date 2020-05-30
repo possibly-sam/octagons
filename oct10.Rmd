@@ -1,0 +1,373 @@
+---
+title: "oct10"
+author: "Phillip Abbott"
+date: "May 25, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Universe
+
+one should have a set of lines in the euclidian plane (actually line segments, but called lines for brevity) (lines being defined by pairs of endpoints).
+
+This set of lines has the following properties.  
+
+* no pair of lines in the set intersect except at endpoints; when a line is added, if it intersects another line away from an endpoint, the lines are split into 2 line segments at the point of intersection 
+
+You can:
+
+* Add a line to it
+* Add another set of lines to it
+* Print the set of lines
+* Rotate the set as a whole around the origin
+* Translate by a vector
+* Reflect in a line through the origin
+* Select a subset of line segments in the set which are all line segments completely within a triangle defined by 3 points
+
+Using the above, one will be able to create tesselations based on polygons which appear as part of the complete graph on a given number of verticies.
+
+When a line is added, we check to see if it intersects with other lines.
+
+For each line in the universe, compare intersection with each other line.  Create a map from line to an array of points of intersection of that line.  When you are done comparing all of them pairwise, then for each line, sort the array of points of intersection and split the line up into the appropriate number of line segments.
+
+When determining which line segments are within a triangle, use the area condition on the endpoints.
+
+
+
+```{r}
+source("u0.R")
+source("ukgraph.R")
+
+
+k6 <- ukgraph(6)
+
+# k6$my_lines %>% map(~.$printme())
+
+# put it into the universe
+
+u6 <- universe()
+
+xx <- k6$my_lines %>% u6$add_lines()
+
+# u6$lines_as_list() %>% map(~.$printme())
+
+u6$pdf()
+
+
+
+```
+
+
+
+# Triangles
+
+Given a triangle, is a point inside or outside the triangle
+
+```{r}
+
+utriangle <- function(pta, ptb, ptc, close_enough = function(a,b) (a-b)^2 < 1e-12 ) {
+  
+  result <- new.env(emptyenv())
+  
+  result$area <- function() (det( matrix( c(pta$x(), ptb$x(), ptc$x(), pta$y(), ptb$y(), ptc$y(),1,1,1 ), 3))/2) %>% abs()
+  
+  result$within <- function(pt0) {
+    xta <- utriangle(pt0, ptb, ptc)
+    xtb <- utriangle(pta, pt0, ptc)
+    xtc <- utriangle(pta, ptb, pt0)
+    
+    return ( close_enough ( result$area(), xta$area()+xtb$area()+xtc$area()))
+    
+    
+  }
+  
+  result
+  
+}
+
+
+x00 <- upt(0,0)
+x01 <- upt(0,1)
+x10 <- upt(1,0)
+x11 <- upt(1,1)
+x33 <- upt(1/3, 1/3)
+
+
+xt0 <- utriangle(x00, x01, x10) 
+xt0$area()
+
+x11 %>% xt0$within()
+x33 %>% xt0$within()
+
+```
+
+
+
+
+# UTriangle
+
+```{r}
+
+source("u0.R")
+source("utriangle.R")
+
+
+
+
+x00 <- upt(0,0)
+x01 <- upt(0,1)
+x10 <- upt(1,0)
+x11 <- upt(1,1)
+x33 <- upt(1/3, 1/3)
+
+
+xt0 <- utriangle(x00, x01, x10) 
+
+uu <- universe()
+
+xt0$as_lines() %>% uu$add_lines(  )
+
+uu$pdf()
+
+
+
+
+
+
+```
+
+
+# translations rotations & reflections
+
+```{r}
+
+
+source("u0.R")
+source("utriangle.R")
+
+
+
+
+x00 <- upt(0,0)
+x01 <- upt(0,1)
+x10 <- upt(1,0)
+x11 <- upt(1,1)
+x33 <- upt(1/3, 1/3)
+
+
+xt0 <- utriangle(x00, x01, x10) 
+
+x01$rotate(pi/4)$printme()
+
+
+uu <- universe()
+
+xt0$as_lines() %>% uu$add_lines(  )
+
+uu$reflect(pi/2)
+
+uu$pdf()
+
+
+
+
+
+```
+
+# Selection
+
+
+```{r}
+
+source("u0.R")
+source("ukgraph.R")
+
+
+k6 <- ukgraph(6)
+
+uu <- universe()
+
+k6$as_lines() %>% uu$add_lines(  )
+
+# uu$pdfa()
+
+uu$subset(upt(0,0), upt(2,0), upt(0,2)) $pdf()
+
+# uu$my_lines %>% View()
+
+
+```
+
+
+# reflection in a line not the origin
+
+```{r}
+
+
+source("u0.R")
+source("ukgraph.R")
+
+
+k6 <- ukgraph(6)
+
+uu <- universe()
+
+k6$as_lines() %>% uu$add_lines(  )
+
+#  uu$pdfa()
+ 
+ 
+hexx <- 0:5 %>% map(~upt(cos(.*pi/3), sin(.*pi/3)))
+
+tta <- utriangle( upt(0,0), hexx[[1]], hexx[[2]] )
+ttb <- utriangle( upt(0,0), hexx[[2]], hexx[[3]] )
+
+
+ttx <- list()
+ttx[[1]] <- tta
+ttx[[2]] <- ttb
+
+ud <- uu$multisubset( ttx )
+
+ud$reflect_in_line( uln(hexx[[1]], hexx[[3]]))
+
+
+
+ud1 <- ud$select_all()
+
+ud1$translate(hexx[[2]]$x(), hexx[[2]]$y())
+ud1$translate(hexx[[2]]$x(), hexx[[2]]$y())
+# ud1$pdfa()
+
+ud2 <- ud1$select_all()
+ud2$rotate(pi/3)
+
+ud3 <- ud2$select_all()
+ud3$rotate(pi/3)
+
+ud4 <- ud3$select_all()
+ud4$rotate(pi/3)
+
+ud5 <- ud4$select_all()
+ud5$rotate(pi/3)
+
+ud6 <- ud5$select_all()
+ud6$rotate(pi/3)
+
+# ud6$pdfa(3)
+
+uud <- list()
+uud[[1]] <- ud1
+uud[[2]] <- ud2
+uud[[3]] <- ud3
+uud[[4]] <- ud4
+uud[[5]] <- ud5
+uud[[6]] <- ud6
+
+
+
+```
+
+ud1$translate(hexx[[2]])
+
+ud2 <- ud1$select_all()
+ud2$rotate(pi/3)
+
+ud3 <- ud2$select_all()
+ud3$rotate(pi/3)
+
+ud4 <- ud3$select_all()
+ud4$rotate(pi/3)
+
+ud5 <- ud4$select_all()
+ud5$rotate(pi/3)
+
+ud6 <- ud5$select_all()
+ud6$rotate(pi/3)
+
+ud6$pdfa()
+
+
+ 
+
+```{r} 
+
+ll0 <- uln(upt(2,0), upt(4,2))
+
+# ll0$projection_of_the_origin()$printme()
+
+# uu$lines_as_list()[[29]]$printme()
+
+addaline <- function(n) {
+  
+  u2 <- uu$select_all()
+  ll29 <- u2$lines_as_list()[[n]]
+  u2$reflect_in_line( ll29 )
+  u2$select_all()
+
+  # uu$add_from_universe(u2,TRUE)
+  
+}
+
+x0 <- c(2,15,16, 29, 38, 43) %>% map(addaline)
+
+x0 %>% map(~uu$add_from_universe(.,TRUE))
+uud %>% map(~uu$add_from_universe(.,TRUE))
+
+# uu$pdf(3)
+
+
+```
+
+
+```{r}
+
+l3 <- uln(upt(3,0), upt(3*cos(pi/3), 3*sin(pi/3)))
+
+u2 <- uu$select_all()
+
+u2$reflect_in_line( l3 )
+  
+u2 %>% uu$add_from_universe(TRUE)
+
+uuu3 <- list()
+
+uuu3[[1]] <- u2$select_all()
+uuu3[[1]] $rotate(pi/3)
+
+uuu3[[2]]  <- uuu3[[1]] $select_all()
+uuu3[[2]] $rotate(pi/3)
+
+uuu3[[3]]  <- uuu3[[2]] $select_all()
+uuu3[[3]] $rotate(pi/3)
+
+uuu3[[4]]  <- uuu3[[3]] $select_all()
+uuu3[[4]] $rotate(pi/3)
+
+uuu3[[5]]  <- uuu3[[4]] $select_all()
+uuu3[[5]] $rotate(pi/3)
+
+uuu3 %>% map(~uu$add_from_universe(.,TRUE))
+
+
+
+```
+
+```{r}
+source("uln.R")
+
+uu$pdf(3/2)
+  
+```
+
+
+
+
+
+
+
+
