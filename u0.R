@@ -142,11 +142,11 @@ universe <- function(close_enough = function(a,b) (a-b)^2 < 1e-12) {
     result$my_lines 
   }
   
-  result$pdf <- function(a=1) {
+  result$pdf <- function(a=1, lwd_=13) {
     
     pdf()
     plot(c(-a, a), c(-a, a), asp=1)
-    result$lines_as_list() %>% map(~.$pdf())
+    result$lines_as_list() %>% map(~.$pdf(lwd_))
     dev.off()
     
     
@@ -174,7 +174,16 @@ universe <- function(close_enough = function(a,b) (a-b)^2 < 1e-12) {
   }
   
   
-
+  
+  result$copy_rotate <- function(theta) {
+    
+    #   browser()
+    rr <- result$select_all()
+    rr$rotate(theta)
+    rr;
+  }
+  
+  
   
   result$rotate <- function(theta) {
     # pick up b, pick up e, rotate them and put them back
@@ -186,6 +195,22 @@ universe <- function(close_enough = function(a,b) (a-b)^2 < 1e-12) {
       e0 <- e0$rotate(theta)
       result$my_lines[k,] <- c(b0$x(), b0$y(), e0$x(), e0$y())
     }
+    
+  }
+  
+  result$copy_rotate_about_point <- function(theta, pt) {
+    #   browser()
+    rr <- result$select_all()
+    rr$copy_rotate_about_point(theta,pt)
+    rr;
+    
+  }
+  
+    
+  result$rotate_about_point <- function(theta, pt) {
+    result$translate(-pt$x(), -pt$y())
+    result$rotate(theta)
+    result$translate(pt$x(), pt$y())
     
   }
   
@@ -203,6 +228,14 @@ universe <- function(close_enough = function(a,b) (a-b)^2 < 1e-12) {
  
       result$my_lines[k,] <- c(b0$x(), b0$y(), e0$x(), e0$y())
     }
+  }
+  
+  result$copy_reflect_in_line <- function(the_line) {
+    
+  #   browser()
+    rr <- result$select_all()
+    rr$reflect_in_line(the_line)
+    rr;
   }
   
   result$reflect_in_line <- function(the_line) {
@@ -237,12 +270,15 @@ universe <- function(close_enough = function(a,b) (a-b)^2 < 1e-12) {
     
   }
   
+  
   result$select_all <- function() {
     r0 <- universe()
     r0$my_lines <- result$my_lines
     r0
-    
+
   }
+
+    result$clone <- result$select_all
   
   result$multisubset <- function(listoftriangle) {
     
