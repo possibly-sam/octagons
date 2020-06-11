@@ -21,7 +21,13 @@ uln <- function(b, e, close_enough = function(a,b) (a-b)^2 < 1e-12 ) {
   
   result$midpoint <- function() upt( (b$x() + e$x())/2, (b$y() + e$y())/2)
   
-  
+  result$informative_plot <- function(chr, lwd_=1) {
+    lines( c(b$x(), e$x()), c(b$y(), e$y()) , lwd=lwd_)
+    text( (b$x()+e$x())/2,  (b$y()+e$y())/2, chr  ,cex=1 )
+    text( b$x(),  b$y(), paste( "(", b$x(), ",", b$y(), ")"), cex=.62)
+    text( e$x(),  e$y(), paste( "(", e$x(), ",", e$y(), ")"), cex=.62)
+    
+  }
   
   result$pdf <- function(lwd_=13) lines( c(b$x(), e$x()), c(b$y(), e$y()) , lwd=lwd_)
   

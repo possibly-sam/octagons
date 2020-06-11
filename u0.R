@@ -12,6 +12,17 @@ universe <- function(close_enough = function(a,b) (a-b)^2 < 1e-12) {
   # internally store as a data frame
   result$my_lines <- data.frame(b.x=0, b.y=0, e.x=0, e.y=0)
   
+  
+  result$write_me <- function(filename="universe.RData") {
+    # browser()
+    save(my_lines,file=filename, envir=result)
+  }
+  
+  result$read_me <- function(filename="universe.RData") {
+    load(filename, result);
+  }
+  
+  
   result$size <- function() result$my_lines %>% nrow()
   
   # use at() to get the uln format of the line instead of the dataframe
@@ -111,6 +122,7 @@ universe <- function(close_enough = function(a,b) (a-b)^2 < 1e-12) {
     
   }
   
+ 
   result$add_line <- function(the_line) {
     result$my_lines <- result$my_lines %>% rbind( data.frame(b.x=the_line$b()$x(), b.y=the_line$b()$y(), e.x=the_line$e()$x(), e.y=the_line$e()$y()))
     
@@ -161,6 +173,15 @@ universe <- function(close_enough = function(a,b) (a-b)^2 < 1e-12) {
                    'U', 'V', 'W', 'X', 'Y', 'Z', '=', '+', ':', ';')
             
   
+  
+  result$informative_plot <- function(xs, ys, lwd_=1) {
+    plot(xs, ys, asp=1, type="n")
+    lal <- result$lines_as_list() 
+    n <- lal %>% length()
+    1:n %>% map(~lal[[.]]$informative_plot(., lwd_))
+
+  }
+  
   result$pdfa <- function(a=1) {
     
     pdf()
@@ -199,9 +220,9 @@ universe <- function(close_enough = function(a,b) (a-b)^2 < 1e-12) {
   }
   
   result$copy_rotate_about_point <- function(theta, pt) {
-    #   browser()
+      # browser()
     rr <- result$select_all()
-    rr$copy_rotate_about_point(theta,pt)
+    rr$rotate_about_point(theta,pt)
     rr;
     
   }

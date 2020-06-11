@@ -58,7 +58,7 @@ komplete_graphs[[7]]$as_lines() %>% the_universe$add_lines()
 the_universe$pdfa()
 
 # Will appear in Rplots.pdf
-
+the_universe$write_me();
 
 ```
 
@@ -72,6 +72,52 @@ tlist[[3]] <- utriangle( komplete_graphs[[7]]$get_point(1),komplete_graphs[[7]]$
 
 
 xx0 <- the_universe$multisubset(tlist)
+
+xx0$write_me("good_bits.RData")
+
+xx0$pdfa()
+
+```
+
+
+
+```{r}
+source("u0.R")
+source("ukgraph.R")
+
+komplete_graphs <- list()
+komplete_graphs[[7]] <- ukgraph(7)
+
+# create the universe
+the_universe <- universe()
+xx0 <- universe()
+the_universe$read_me("universe.RData")
+xx0$read_me("good_bits.RData")
+
+the_inscribed_polygon <- komplete_graphs[[7]]$get_inscribed_polygon()
+
+xx1 <- xx0$copy_reflect_in_line( the_inscribed_polygon [[7]] ) 
+
+
+
+# xx %>% map(~ the_universe$add_from_universe(.,TRUE))
+
+xx2 <- 1:7 %>% map(~ xx1$copy_rotate(2*.*pi/7) )
+
+xx2 %>% map(~ the_universe$add_from_universe(.,TRUE))
+
+# the_universe$add_from_universe(xx1,TRUE)
+the_universe$pdf(3,6)
+
+
+```
+
+
+
+
+
+```{r}
+
 
 ttlist <- list()
 ttlist[[1]] <- tlist[[2]]
@@ -158,7 +204,11 @@ the_universe$pdf(3,6)
 
 # Revised Syntax.
 
-The current scheme allows one to create geometric drawings based on subsets, translations, rotations & reflections of complete graphs.  But the syntax is 
+The current scheme allows one to create geometric drawings based on subsets, translations, rotations & reflections of complete graphs.  But the syntax is suboptimal.  It should be something more like
+
+u0 <- k(7)
+
+u1 <- u0 %>>% translation(1,0)
 
 
 
@@ -166,9 +216,267 @@ The current scheme allows one to create geometric drawings based on subsets, tra
 
 
 
+```{r}
+
+all_rotations <- function(n, of, into) {
+  result <- into$select_all()
+
+  xx2 <- 1:n %>% map(~ of$copy_rotate(2*.*pi/n) )
+
+  xx2 %>% map(~ result$add_from_universe(.,TRUE))
+  
+  result
+}
+
+komplete_graphs <- list()
+komplete_graphs[[7]] <- ukgraph(7)
+
+k7pts <- 1:7 %>% map(~komplete_graphs[[7]]$get_point(.))
+
+k7pts[[1]]$printme()
+
+
+
+a0 <- uln(k7pts[[1]], k7pts[[4]])
+b0 <- uln(k7pts[[3]], k7pts[[5]])
+
+cpt <- a0$intersect(b0)
+
+
+k7 <- universe()
+k7$read_me("universe.RData")
+
+xx0 <- universe()
+xx0$read_me("good_bits.RData")
+the_inscribed_polygon <- komplete_graphs[[7]]$get_inscribed_polygon()
+xx1 <- xx0$copy_reflect_in_line( the_inscribed_polygon [[7]] ) 
+
+
+wedge <- k7$subset(cpt, k7pts[[1]], k7pts[[3]] ) 
+wedge$translate(k7pts[[4]]$x() - k7pts[[1]]$x(),  k7pts[[4]]$y() - k7pts[[1]]$y())
+
+
+
+k7 <- all_rotations(7, wedge, k7)
+# k7 <- all_rotations(7, wedge, k7)
+k7 <- all_rotations(7, xx1, k7)
+
+
+
+# k7$add_from_universe(wedge,TRUE)
+k7$pdf(3,6)
+
+```
+
+
+```{r}
+
+source("u0.R")
+source("ukgraph.R")
+
+
+all_rotations <- function(n, of, into) {
+  result <- into$select_all()
+
+  xx2 <- 1:n %>% map(~ of$copy_rotate(2*.*pi/n) )
+
+  xx2 %>% map(~ result$add_from_universe(.,TRUE))
+  
+  result
+}
+
+
+# create the complete graph on 7 verticies.  
+komplete_graphs <- list()
+komplete_graphs[[5]] <- ukgraph(5)
+
+the_inscribed_polygon <- komplete_graphs[[5]]$get_inscribed_polygon()
+
+1:5 %>% map(~ komplete_graphs[[5]]$get_point(.)$printme())
+the_inscribed_polygon %>% map(~.$printme())
+
+# create the universe
+the_universe <- universe()
+
+# put the complete graph into the universe
+komplete_graphs[[5]]$as_lines() %>% the_universe$add_lines()
+
+the_minor_triangle <- the_universe$subset(komplete_graphs[[5]]$get_point(1),komplete_graphs[[5]]$get_point(3),komplete_graphs[[5]]$get_point(4) )
+
+the_minor_triangle$reflect_in_line(the_inscribed_polygon[[2]])
+the_minor_triangle$write_me("minor_triange.RData")
+#  m2 <- the_minor_triangle$copy_rotate_about_point(2*pi/5)
+
+the_universe <- all_rotations(5, the_minor_triangle, the_universe)
+
+# the_universe$add_from_universe(m2,TRUE)
+
+# print the universe
+the_universe$pdf(5.2361/2)
+
+the_universe$write_me("nice_star.RData")
+
+```
+
+
+```{r}
+
+
+source("u0.R")
+source("ukgraph.R")
+
+phi <- (sqrt(5)+1)/2
+
+
+all_rotations <- function(n, of, into) {
+  result <- into$select_all()
+
+  xx2 <- 1:n %>% map(~ of$copy_rotate(2*.*pi/n) )
+
+  xx2 %>% map(~ result$add_from_universe(.,TRUE))
+  
+  result
+}
+
+the_universe <- universe()
+the_minor_triangle <- universe()
+the_minor_triangle$read_me("minor_triange.RData")
+the_universe$read_me("nice_star.RData")
+
+the_minor_triangle$rotate_about_point(pi/5, upt(-phi-1,0))
+the_minor_triangle$pdf(5.2361/2)
+the_universe <- all_rotations(5, the_minor_triangle, the_universe)
+the_minor_triangle$rotate_about_point(-2*pi/5, upt(-phi-1,0))
+the_universe <- all_rotations(5, the_minor_triangle, the_universe)
+
+the_universe$pdf(phi+1)
+
+the_universe$write_me("pent-02.RData")
+
+```
+
+
+',i
+
+# A Generic Algorithm
+
+*  Let L =  K_n, the complete graph on n verticies
+*  Let P_0 be a point in L, e.g. (1,0)
+*  Let P_1 and P_2 be the points in L at angle pi/n and -pi/n from P_0 [orientation problem]
+*  Let T be the triangle (P_0 P_1 P_2) and all segements in L on or in that triangle
+*  Let T_0'  be the reflection of T in the line (P_1 P_2)
+*  Let P_0' be the image of P_0 in that reflection
+*  Rotate T_0' by k \cdot pi/n and -k \cdot pi/n for k=1..n-4 giving T_1k' and T_2k'
+*  Rotate T_0', T_1k' and T_2k' around the origin by 2k*pi/n for k in [0, n-1].  (There is overlap)
+*  This gives a new graph inscribed by a regular n-gon
+*  Let L be this new graph, set P_0 = P_0' and return to step 3
+
+
+
+```{r}
+
+source("u0.R")
+source("ukgraph.R")
+
+the_universe <- universe()
+the_universe$read_me("pent-02.RData")
+
+pta <- upt(-phi-1-.1, 0)
+ptb <- upt(2.12, 1.54)
+ptc <- upt(2.12, -1.54)
+
+
+# the_minor_triangle <- the_universe$subset(pta, ptb, ptc)
+
+# the_minor_triangle$pdf(3)
+# the_minor_triangle$informative_plot( c(-3, 3), c(-3, 3))
+the_universe$informative_plot(c(1.5, 2.5), c( -.5, .5))
+
+# the_minor_triangle$write_me("min-tri-02.RData")
+
+
+
+```
+
+```{r}
 
 
 
 
+source("u0.R")
+source("ukgraph.R")
+
+
+
+all_rotations <- function(n, of, into) {
+  result <- into$select_all()
+
+  xx2 <- 1:n %>% map(~ of$copy_rotate(2*.*pi/n) )
+
+  xx2 %>% map(~ result$add_from_universe(.,TRUE))
+  
+  result
+}
+
+
+the_universe <- universe()
+the_minor_triangle <- universe()
+the_universe$read_me("pent-02.RData")
+the_minor_triangle$read_me("min-tri-02.RData")
+
+x0 <- the_universe$my_lines$b.x %>% max()
+p0 <- upt(x0, -1)
+p1 <- upt(x0, 1)
+
+the_minor_triangle$reflect_in_line( uln(p0, p1) )
+
+the_minor_triangle$pdf(6)
+
+rotate_about_me <- upt(the_minor_triangle$my_lines$b.x %>% max(), 0)
+
+amin <- the_minor_triangle$copy_rotate_about_point(pi/5, rotate_about_me)
+bmin <- the_minor_triangle$copy_rotate_about_point(-pi/5, rotate_about_me)
+
+
+the_universe <- all_rotations(5, the_minor_triangle, the_universe)
+the_universe <- all_rotations(5, amin, the_universe)
+the_universe <- all_rotations(5, bmin, the_universe)
+
+
+the_universe$pdf(8,1)
+
+the_universe$write_me("pent-03.RData")
+
+```
+
+
+
+```{r}
+source("u0.R")
+source("ukgraph.R")
+
+
+
+all_rotations <- function(n, of, into) {
+  result <- into$select_all()
+
+  xx2 <- 1:n %>% map(~ of$copy_rotate(2*.*pi/n) )
+
+  xx2 %>% map(~ result$add_from_universe(.,TRUE))
+  
+  result
+}
+
+
+the_universe <- universe()
+the_minor_triangle <- universe()
+the_universe$read_me("pent-03.RData")
+# the_minor_triangle$read_me("min-tri-02.RData")
+
+
+
+the_universe$pdf(7,4)
+
+```
 
 
