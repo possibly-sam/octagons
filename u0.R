@@ -314,6 +314,7 @@ universe <- function(close_enough = function(a,b) (a-b)^2 < 1e-12) {
     
   }
   
+  # return the universe that is within this triangle
   result$subset <- function(pt0, pt1, pt2) {
     
     i0 <- rep(FALSE, result$my_lines%>%nrow())
@@ -332,6 +333,38 @@ universe <- function(close_enough = function(a,b) (a-b)^2 < 1e-12) {
     r0
     
   }
+  
+  # remove duplicates & single points
+  result$clean_up <- function() {
+    fn0 <- function(bx, by, ex, ey) { (ex-bx)^2 + (ey-by)^2 }
+    fn1 <- function(it) fn0(it[1], it[2], it[3], it[4] )
+    
+    p0 <- !(result$my_lines[,] %>% fn1() %>% close_enough(0)) 
+    result$my_lines <- result$my_lines[p0,]
+    
+  }
+  
+  # Use max x and min x to find the pivot points 
+  # which will be on the x axis by construction
+  result$get_max_x <- function() { 
+    max(
+     ( result$my_lines$b.x %>% max() ) ,
+    ( result$my_lines$e.x %>% max() ) )
+  }
+  
+  result$get_min_x <- function() {
+    min(
+      ( result$my_lines$b.x %>% min() ) ,
+      ( result$my_lines$e.x %>% min() ) )
+    
+  }
+  
+  result$get_max_y_subject_to_x <- function(x0) {
+    max(
+    result$my_lines[ close_enough(x0,result$my_lines$b.x), "b.y" ] %>% max() , 
+    result$my_lines[ close_enough(x0,result$my_lines$e.x), "e.y" ] %>% max() )
+  }
+  
   
   result
 }

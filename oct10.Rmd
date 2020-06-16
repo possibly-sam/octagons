@@ -473,10 +473,221 @@ the_minor_triangle <- universe()
 the_universe$read_me("pent-03.RData")
 # the_minor_triangle$read_me("min-tri-02.RData")
 
-
+the_universe$clean_up()
+the_universe$write_me("pent-03.RData")
 
 the_universe$pdf(7,4)
 
 ```
+
+
+
+
+```{r}
+
+close_enough = function(a,b) (a-b)^2 < 1e-12
+
+fn0 <- function(bx, by, ex, ey) { (ex-bx)^2 + (ey-by)^2 }
+fn1 <- function(it) fn0(it[1], it[2], it[3], it[4] )
+
+ !(the_universe$my_lines[,] %>% fn1() %>% close_enough(0)) %>% head()
+
+
+the_universe$my_lines %>% str()
+
+```
+
+
+
+
+```{r}
+
+close_enough = function(a,b) (a-b)^2 < 1e-12
+
+
+ssame <- function(lhs, rhs) {
+  (close_enough(lhs[1], rhs[1]) &&
+    close_enough(lhs[2], rhs[2]) &&
+    close_enough(lhs[3], rhs[3]) &&
+    close_enough(lhs[4], rhs[4]) ) ||
+    (close_enough(lhs[1], rhs[3]) &&
+    close_enough(lhs[2], rhs[4]) &&
+    close_enough(lhs[3], rhs[1]) &&
+    close_enough(lhs[4], rhs[2]) )
+}
+
+iin <- function(it, rhs) {
+  for (k in 1:nrow(rhs)) if (ssame(it, rhs[k,])) return (TRUE);
+  FALSE;
+}
+
+result <- the_universe
+
+n0 <- nrow(result$my_lines)
+x0 <- rep(TRUE, n0) 
+for (k in 1:(n0-1)) {
+  x0[k] <- !(result$my_lines[k,] %>% iin(result$my_lines[(k+1):n0,] ))
+}
+
+result$my_lines[x0,] %>% View()
+
+
+```
+
+# 4th level pentagon
+
+```{r}
+source("u0.R")
+source("ukgraph.R")
+
+
+
+all_rotations <- function(n, of, into) {
+  result <- into$select_all()
+
+  xx2 <- 1:n %>% map(~ of$copy_rotate(2*.*pi/n) )
+
+  xx2 %>% map(~ result$add_from_universe(.,TRUE))
+  
+  result
+}
+
+
+the_universe <- universe()
+
+the_universe$read_me("pent-03.RData")
+# the_minor_triangle$read_me("min-tri-02.RData")
+
+# the_universe$clean_up()
+# the_universe$write_me("pent-03.RData")
+
+# the_universe$pdf(7,4)
+
+the_universe$get_max_x()
+y0 <- the_universe$get_min_x() %>% the_universe$get_max_y_subject_to_x()
+
+pta <- upt( the_universe$get_max_x(), 0 )
+ptb <- upt( the_universe$get_min_x(), y0 )
+ptc <- upt( the_universe$get_min_x(), -y0 )
+
+the_minor_triangle <- the_universe$subset(pta, ptb, ptc)
+
+
+
+the_minor_triangle$reflect_in_line(uln(ptb, ptc))
+
+
+ptd <- upt(the_minor_triangle$get_min_x(), 0)
+
+the_minor_triangle_up <- the_minor_triangle$copy_rotate_about_point(pi/5, ptd)
+the_minor_triangle_down <- the_minor_triangle$copy_rotate_about_point(-pi/5, ptd)
+
+
+the_universe <- all_rotations(5, the_minor_triangle, the_universe)
+the_universe <- all_rotations(5, the_minor_triangle_up, the_universe)
+the_universe <- all_rotations(5, the_minor_triangle_down, the_universe)
+
+
+the_universe$write_me("pent-04.RData")
+
+the_universe$pdf(17,2)
+
+
+```
+
+
+
+```{r}
+
+
+the_universe <- universe()
+
+the_universe$read_me("pent-04.RData")
+
+the_universe$pdf(34,1)
+```
+
+
+
+# 5th level pentagon
+
+```{r}
+source("u0.R")
+source("ukgraph.R")
+
+
+
+all_rotations <- function(n, of, into) {
+  result <- into$select_all()
+
+  xx2 <- 1:n %>% map(~ of$copy_rotate(2*.*pi/n) )
+
+  xx2 %>% map(~ result$add_from_universe(.,TRUE))
+  
+  result
+}
+
+
+the_universe <- universe()
+
+the_universe$read_me("pent-04.RData")
+# the_minor_triangle$read_me("min-tri-02.RData")
+
+# the_universe$clean_up()
+# the_universe$write_me("pent-03.RData")
+
+# the_universe$pdf(7,4)
+
+# the_universe$get_max_x()
+y0 <- the_universe$get_max_x() %>% the_universe$get_max_y_subject_to_x()
+
+pta <- upt( the_universe$get_min_x(), 0 )
+ptb <- upt( the_universe$get_max_x(), y0 )
+ptc <- upt( the_universe$get_max_x(), -y0 )
+
+the_minor_triangle <- the_universe$subset(pta, ptb, ptc)
+
+
+
+the_minor_triangle$reflect_in_line(uln(ptb, ptc))
+
+
+ptd <- upt(the_minor_triangle$get_max_x(), 0)
+
+the_minor_triangle_up <- the_minor_triangle$copy_rotate_about_point(pi/5, ptd)
+the_minor_triangle_down <- the_minor_triangle$copy_rotate_about_point(-pi/5, ptd)
+
+
+the_universe <- all_rotations(5, the_minor_triangle, the_universe)
+the_universe <- all_rotations(5, the_minor_triangle_up, the_universe)
+the_universe <- all_rotations(5, the_minor_triangle_down, the_universe)
+
+
+the_universe$write_me("pent-05.RData")
+
+the_universe$pdf(34,1)
+
+
+```
+
+
+
+
+
+```{r}
+
+
+the_universe <- universe()
+
+the_universe$read_me("pent-05.RData")
+
+the_universe$pdf(50,1)
+```
+
+
+
+
+
+
 
 
