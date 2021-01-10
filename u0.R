@@ -3,7 +3,6 @@ source("uln.R")
 source("utriangle.R")
 
 
-
 universe <- function(close_enough = function(a,b) (a-b)^2 < 1e-12) {
   
   result <- new.env(emptyenv())

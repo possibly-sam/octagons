@@ -42,16 +42,17 @@ When determining which line segments are within a triangle, use the area conditi
 source("u0.R")
 source("ukgraph.R")
 
+number_of_verticies <- 13
 
 # create the complete graph on 7 verticies.  
 komplete_graphs <- list()
-komplete_graphs[[7]] <- ukgraph(7)
+komplete_graphs[[number_of_verticies]] <- ukgraph(number_of_verticies)
 
 # create the universe
 the_universe <- universe()
 
 # put the complete graph into the universe
-komplete_graphs[[7]]$as_lines() %>% the_universe$add_lines()
+komplete_graphs[[number_of_verticies]]$as_lines() %>% the_universe$add_lines()
 
 
 # print the universe
@@ -65,13 +66,24 @@ the_universe$write_me();
 
 ```{r}
 
+number_of_verticies <- 13
+
+# create the complete graph on 7 verticies.  
+komplete_graphs <- list()
+komplete_graphs[[number_of_verticies]] <- ukgraph(number_of_verticies)
+
+k13 <- komplete_graphs[[number_of_verticies]]
+
 tlist <- list()
-tlist[[1]] <- utriangle( komplete_graphs[[7]]$get_point(1),komplete_graphs[[7]]$get_point(2), komplete_graphs[[7]]$get_point(4))
-tlist[[2]] <- utriangle( komplete_graphs[[7]]$get_point(1),komplete_graphs[[7]]$get_point(4), komplete_graphs[[7]]$get_point(5))
-tlist[[3]] <- utriangle( komplete_graphs[[7]]$get_point(1),komplete_graphs[[7]]$get_point(5), komplete_graphs[[7]]$get_point(6))
+#tlist[[1]] <- utriangle( komplete_graphs[[number_of_verticies]]$get_point(1),komplete_graphs[[number_of_verticies]]$get_point(2), komplete_graphs[[number_of_verticies]]$get_point(4))
+#tlist[[2]] <- utriangle( komplete_graphs[[number_of_verticies]]$get_point(1),komplete_graphs[[number_of_verticies]]$get_point(4), komplete_graphs[[number_of_verticies]]$get_point(5))
+#tlist[[3]] <- utriangle( komplete_graphs[[number_of_verticies]]$get_point(1),komplete_graphs[[number_of_verticies]]$get_point(5), komplete_graphs[[number_of_verticies]]$get_point(6))
 
 
-xx0 <- the_universe$multisubset(tlist)
+
+
+# xx0 <- the_universe$multisubset(tlist)
+xx0 <- the_universe$subset(k13$get_point(1), k13$get_point(2), k13$get_point(8)) 
 
 xx0$write_me("good_bits.RData")
 
@@ -85,8 +97,8 @@ xx0$pdfa()
 source("u0.R")
 source("ukgraph.R")
 
-komplete_graphs <- list()
-komplete_graphs[[7]] <- ukgraph(7)
+# komplete_graphs <- list()
+# komplete_graphs[[number_of_verticies]] <- ukgraph(number_of_verticies)
 
 # create the universe
 the_universe <- universe()
@@ -94,20 +106,20 @@ xx0 <- universe()
 the_universe$read_me("universe.RData")
 xx0$read_me("good_bits.RData")
 
-the_inscribed_polygon <- komplete_graphs[[7]]$get_inscribed_polygon()
+the_inscribed_polygon <- ukgraph(number_of_verticies)$get_inscribed_polygon()
 
-xx1 <- xx0$copy_reflect_in_line( the_inscribed_polygon [[7]] ) 
+xx1 <- xx0$copy_reflect_in_line( the_inscribed_polygon [[number_of_verticies]] ) 
 
 
 
 # xx %>% map(~ the_universe$add_from_universe(.,TRUE))
 
-xx2 <- 1:7 %>% map(~ xx1$copy_rotate(2*.*pi/7) )
+xx2 <- 1:number_of_verticies %>% map(~ xx1$copy_rotate(2*.*pi/number_of_verticies) )
 
 xx2 %>% map(~ the_universe$add_from_universe(.,TRUE))
 
-# the_universe$add_from_universe(xx1,TRUE)
-the_universe$pdf(3,6)
+ the_universe$add_from_universe(xx1,TRUE)
+the_universe$pdf(sqrt(1),2)
 
 
 ```
